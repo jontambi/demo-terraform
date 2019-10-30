@@ -66,6 +66,7 @@ resource "aws_network_acl" "main_allow" {
     }
 }
 
+# Create Security Group SSH
 resource "aws_security_group" "ssh_allow" {
     name = "Terraform Demo - Allow ssh traffic"
     description = "Allows all ssh traffic"
@@ -84,6 +85,27 @@ resource "aws_security_group" "ssh_allow" {
         protocol = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
+}
+
+# Create Security Group HTTP
+resource "aws_security_group" "http_allow" {
+    name = "Terraform Demo - Allow http traffic"
+    description = "Allows all http traffic Jenkins"
+    vpc_id = aws_vpc.main_vpc.id
+
+    ingress {
+        from_port = 8080
+        to_port = 8080
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+#    egress {
+#        from_port = 0
+#        to_port = 0
+#        protocol = "tcp"
+#        cidr_blocks = ["0.0.0.0/0"]
+#    }
 }
 
 # Create Elastic IP
@@ -106,6 +128,10 @@ resource "aws_instance" "webserver" {
     key_name = aws_key_pair.ssh_default.key_name
     vpc_security_group_ids = [aws_security_group.ssh_allow.id]
     subnet_id = aws_subnet.main_subnet.id
+
+    tags = {
+        Name = "jenkins-demo"
+    }
 }
 
 output "public_ip" {
