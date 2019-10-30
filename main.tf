@@ -134,6 +134,12 @@ resource "aws_instance" "webserver" {
     }
 
     provisioner "remote-exec" {
+        connection {
+            host = aws_instance.webserver.public_ip
+            type = "ssh"
+            user = "centos"
+            private_key = aws_key_pair.ssh_default.key_name
+        }
         inline = [
 
             "sudo yum install java-1.8.0-openjdk-devel",
