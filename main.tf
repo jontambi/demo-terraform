@@ -130,30 +130,36 @@ resource "aws_instance" "webserver" {
     subnet_id = aws_subnet.main_subnet.id
 
     tags = {
+
         Name = "jenkins-demo"
     }
+}
 
-#    provisioner "remote-exec" {
+resource "null_resource" "jenkins_provisioner" {
+    depends_on = ["aws_instance.webserver"]
+    triggers = {
+        public_ip = aws_instance.webserver.public_ip
+    }
 
-#        connection {
-#            host = aws_instance.webserver.public_ip
-#            type = "ssh"
-#            user = "centos"
-#            private_key = "${file("~/.ssh/id_rsa")}"
-#        }
+    connection {
+        type = "ssh"
+        host = aws_instance.webserver.public_ip
+        user = "centos"
+        private_key = "${file("~/.ssh/id_rsa")}"
+    }
 
-#        inline = [
+    provisioner "file" {
+        source = "files/script.sh"
+        destination = "/tmp/script.sh"
+    }
 
-#            "sudo yum install java-1.8.0-openjdk-devel",
-#            "curl --silent --location http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo | sudo tee /etc/yum.repos.d/jenkins.repo",
-#            "sudo rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key",
-#            "sudo yum install jenkins",
-#            "sudo yum update -y",
-#            "sudo systemctl start jenkins",
-#            "sudo systemctl enable jenkins",
-#            "sudo cat /var/lib/jenkins/secrets/initialAdminPassword",
-#        ]
-#    }
+    provisioner "remote-exec" {
+        inline = [
+            "chmod +x /tmp/script.sh",
+            "/tmp/scripts.sh args",
+        ]
+    }
+
 }
 
 output "public_ip" {
@@ -161,6 +167,9 @@ output "public_ip" {
 }
 
 ### AMI CENTOS7 ami-02eac2c0129f6376b
+# Install Jenkins: https://linuxize.com/post/how-to-install-jenkins-on-centos-7/
+# Reference Provisioner: https://github.com/gruntwork-io/terratest/blob/master/examples/terraform-remote-exec-example/main.tf
+
 
 
 
