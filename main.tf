@@ -136,16 +136,17 @@ resource "aws_instance" "webserver" {
 }
 
 resource "null_resource" "jenkins_provisioner" {
-    depends_on = ["aws_instance.webserver"]
+    
     triggers = {
-        public_ip = aws_instance.webserver.public_ip
+#        public_ip = aws_eip.ip_server
+        server_id = "${aws_instance.webserver.id}"
     }
 
     connection {
-        type = "ssh"
+#        type = "ssh"
         host = aws_instance.webserver.public_ip
         user = "centos"
-        private_key = "${file("~/.ssh/id_rsa")}"
+#        private_key = "${file("~/.ssh/id_rsa")}"
     }
 
     provisioner "file" {
