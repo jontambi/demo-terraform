@@ -4,11 +4,9 @@
     "source_ami": "ami-02eac2c0129f6376b",
     "instance_type": "t2.micro",
     "ssh_username": "centos",
-    "subnet_id": "subnet-0dea9c26f5e1772fe",
     "ami_name": "centos7_base_img_{{timestamp}}",
-    "associate_public_ip_address": true,
     "tags": {
-      "Name": "Image-base"
+      "Name": "Image_base_Centos7"
     }
   }],
 
